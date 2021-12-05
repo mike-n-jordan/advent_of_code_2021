@@ -1,9 +1,5 @@
 package com.mike.advent
 
-import java.lang.Integer.max
-import java.lang.Integer.min
-
-
 fun main() {
     problem5_2()
 }
@@ -41,41 +37,24 @@ class Board(
 )
 
 private fun Board.drawVerticalAndHorizontal(line: Pair<Point, Point>, diagonalEnabled: Boolean = false): Board {
-    if (line.first.x != line.second.x && line.first.y == line.second.y) {
-        var min = min(line.first.x, line.second.x)
-        val max = max(line.first.x, line.second.x)
-        while (min <= max) {
-            val row = grid.getOrPut(min) { HashMap() }
-            val newValue = row.getOrDefault(line.second.y, 0) + 1
-            row.put(line.second.y, newValue)
-            if (newValue == 2) count++
-            min++
-        }
-    } else if (line.first.x == line.second.x && line.first.y != line.second.y) {
-        var min = min(line.first.y, line.second.y)
-        val max = max(line.first.y, line.second.y)
-        val row = grid.getOrPut(line.first.x) { HashMap() }
-        while (min <= max) {
-            val newValue = row.getOrDefault(min, 0) + 1
-            row.put(min, newValue)
-            if (newValue == 2) count++
-            min++
-        }
-    }
-    else if (diagonalEnabled) {
+    if (
+        diagonalEnabled
+        || line.first.x == line.second.x && line.first.y != line.second.y
+        || line.first.x != line.second.x && line.first.y == line.second.y
+    ) {
         val minXLine = if (line.first.x < line.second.x) line.first else line.second
         val maxXLine = if (minXLine === line.first) line.second else line.first
-        val yIncrement = if (minXLine.y < maxXLine.y) 1 else -1
+        val yIncrement = if (minXLine.y == maxXLine.y) 0 else if (minXLine.y < maxXLine.y) 1 else -1
+        val xIncrement = if (minXLine.x == maxXLine.x) 0 else 1
 
-        var min = minXLine.x
+        var minX = minXLine.x
         var minY = minXLine.y
-        val max = maxXLine.x
-        while (min <= max) {
-            val row = grid.getOrPut(min) { HashMap() }
+        while (minX - xIncrement != maxXLine.x || minY - yIncrement != maxXLine.y) {
+            val row = grid.getOrPut(minX) { HashMap() }
             val newValue = row.getOrDefault(minY, 0) + 1
-            row.put(minY, newValue)
+            row[minY] = newValue
             if (newValue == 2) count++
-            min++
+            minX += xIncrement
             minY += yIncrement
         }
     }
