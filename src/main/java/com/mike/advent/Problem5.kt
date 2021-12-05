@@ -18,7 +18,7 @@ private fun problem5_1() {
 private fun problem5_2() {
     inputSequence("problem5-1.txt")
         .map { line -> line.toPointPair() }
-        .fold(Board()) { acc, i -> acc.drawVerticalAndHorizontal(i, verticalEnabled = true) }
+        .fold(Board()) { acc, i -> acc.drawVerticalAndHorizontal(i, diagonalEnabled = true) }
         .let { println(it.count) }
 }
 
@@ -40,7 +40,7 @@ class Board(
     val grid: HashMap<Int, HashMap<Int, Int>> = HashMap()
 )
 
-private fun Board.drawVerticalAndHorizontal(line: Pair<Point, Point>, verticalEnabled: Boolean = false): Board {
+private fun Board.drawVerticalAndHorizontal(line: Pair<Point, Point>, diagonalEnabled: Boolean = false): Board {
     if (line.first.x != line.second.x && line.first.y == line.second.y) {
         var min = min(line.first.x, line.second.x)
         val max = max(line.first.x, line.second.x)
@@ -62,7 +62,7 @@ private fun Board.drawVerticalAndHorizontal(line: Pair<Point, Point>, verticalEn
             min++
         }
     }
-    else if (verticalEnabled) {
+    else if (diagonalEnabled) {
         val minXLine = if (line.first.x < line.second.x) line.first else line.second
         val maxXLine = if (minXLine === line.first) line.second else line.first
         val yIncrement = if (minXLine.y < maxXLine.y) 1 else -1
