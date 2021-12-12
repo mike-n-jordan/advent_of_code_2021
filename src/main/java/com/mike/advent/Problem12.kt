@@ -1,7 +1,7 @@
 package com.mike.advent
 
 fun main() {
-    problem12_1()
+    problem12_2()
 }
 
 sealed interface Cave {
@@ -18,7 +18,14 @@ sealed interface Cave {
 private fun problem12_1() {
     inputSequence("problem12-1.txt")
         .toCaveMap()
-        .let { dfs(Cave.Start, it, it.keys.size) }
+        .let { dfs(Cave.Start, it) }
+        .let { println(it) }
+}
+
+private fun problem12_2() {
+    inputSequence("problem12-1.txt")
+        .toCaveMap()
+        .let { dfs(Cave.Start, it, canVisitCaveTwice = true) }
         .let { println(it) }
 }
 
@@ -41,13 +48,14 @@ private fun String.toCave(): Cave =
 private fun dfs(
     current: Cave,
     map: Map<Cave, List<Cave>>,
-    limit: Int,
     visited: Set<Cave> = emptySet(),
-    length: Int = 0
+    length: Int = 0,
+    canVisitCaveTwice: Boolean = false,
 ): Int {
-    if (length > limit) return 0
     if (current is Cave.End) return 1
-    val nextOptions = map[current]?.filter { !visited.contains(it) } ?: emptyList()
+    val nextOptions = map[current]?.filter {
+        !visited.contains(it) || (it is Cave.SmallCave && canVisitCaveTwice)
+    } ?: emptyList()
 
     val newVisited = when (current) {
         is Cave.End,
@@ -56,5 +64,5 @@ private fun dfs(
         is Cave.Start -> visited.plus(current)
     }
 
-    return nextOptions.map { dfs(it, map, limit, newVisited, length + 1) }.sum()
+    return nextOptions.map { dfs(it, map, newVisited, length + 1, !visited.contains(it) && canVisitCaveTwice) }.sum()
 }
